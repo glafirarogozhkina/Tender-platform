@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тендеры Pro - API, ML</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 6px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+            max-width: 720px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 260px;
+        }
+        .form-group.form-group--short {
+            flex: 0 0 auto;
+            min-width: 100px;
+            max-width: 120px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fafafa;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+            background: #fff;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+        }
+        .form-section:last-of-type { margin-bottom: 0; }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+        }
+        .section-title .icon { margin-right: 6px; opacity: 0.85; }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px 24px;
+            margin-top: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: #444;
+            padding: 6px 0;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+            flex-shrink: 0;
+        }
+        .section-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .source-toggle-btn {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #475569;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .source-toggle-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .field-invalid {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+        }
+        .field-error {
+            margin-top: 6px;
+            color: #dc2626;
+            font-size: 12px;
+            min-height: 16px;
+        }
+        .form-error {
+            margin-top: 10px;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 500;
+            min-height: 18px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .status-panel.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-rts {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-rutend {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-synapse {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-tenderpro {
+            background: #e8eaf6;
+            color: #5e35b1;
+        }
+
+        .badge-rostender {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-tektorg {
+            background: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        .badge-b2b {
+            background: #e0f2f1;
+            color: #00695c;
+        }
+
+        .badge-sberbank {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-zakazrf {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .badge-roseltorg {
+            background: #e1f5fe;
+            color: #0277bd;
+        }
+
+        .badge-fabrikant {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .badge-etpgpb {
+            background: #ede7f6;
+            color: #4527a0;
+        }
+
+        .badge-china {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .tender-card.b2b-style { border-left: 4px solid #00695c; }
+        .tender-card.sberbank-style { border-left: 4px solid #2e7d32; }
+        .tender-card.zakazrf-style { border-left: 4px solid #c62828; }
+        .tender-card.roseltorg-style { border-left: 4px solid #0277bd; }
+        .tender-card.fabrikant-style { border-left: 4px solid #f57f17; }
+        .tender-card.etpgpb-style { border-left: 4px solid #4527a0; }
+        .tender-card.china-style { border-left: 4px solid #e65100; }
+
+        .china-offer-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #f0f0f0;
+        }
+        .china-offer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        .china-offer-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .china-offer-card .offer-body {
+            padding: 12px;
+        }
+        .china-offer-card .offer-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .china-offer-card .offer-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e65100;
+        }
+        .china-offer-card .offer-shop {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .china-offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .china-section {
+            background: white;
+            border-radius: 15px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+        .china-section h3 {
+            margin-bottom: 16px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .results {
+            display: grid;
+            gap: 20px;
+        }
+
+        .tender-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tender-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .tender-card.rts-style {
+            border-left: 4px solid #1976d2;
+        }
+
+        .tender-card.rutend-style {
+            border-left: 4px solid #7b1fa2;
+        }
+
+        .tender-card.synapse-style {
+            border-left: 4px solid #f57c00;
+        }
+
+        .tender-card.tenderpro-style {
+            border-left: 4px solid #5e35b1;
+        }
+
+        .tender-card.rostender-style {
+            border-left: 4px solid #1565c0;
+        }
+
+        .tender-card.tektorg-style {
+            border-left: 4px solid #1a73e8;
+        }
+
+        .auction__info {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .auction__badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .auction__number {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .auction__type-badge {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .auction__price-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 16px;
+            margin-left: auto;
+        }
+
+        .tender-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .tender-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            flex: 1;
+        }
+
+        .tender-title a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .tender-title a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .tender-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .meta-item {
+            font-size: 13px;
+        }
+
+        .meta-label {
+            color: #999;
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .meta-value {
+            color: #333;
+        }
+
+        .ml-block {
+            margin-top: 15px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .ml-block .ml-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .risk-medium {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .no-results-text {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .error-panel {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #c62828;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+
+            .form-group {
+                min-width: 100%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .tender-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ml-block {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #475569;
+            border-left: 3px solid #667eea;
+        }
+        .ml-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .risk-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .risk-low { background: #dcfce7; color: #166534; }
+        .risk-medium { background: #fef9c3; color: #854d0e; }
+        .risk-high { background: #fee2e2; color: #991b1b; }
+
+        .selection-toolbar {
+            display: none;
+            margin-bottom: 14px;
+            justify-content: flex-end;
+        }
+        .selection-toolbar.active {
+            display: flex;
+        }
+        .select-all-btn {
+            border: 1px solid #dbe4ff;
+            background: #eef2ff;
+            color: #3742a5;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .select-all-btn:hover {
+            background: #e0e7ff;
+        }
+        .tender-select {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            cursor: pointer;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .ai-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border: 1px solid #667eea; border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .ai-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .ai-btn .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #fff3; border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .ai-result {
+            margin-top: 10px; padding: 14px; border-radius: 10px;
+            background: linear-gradient(135deg, #f8f9ff, #f0f1ff); border: 1px solid #ddd5ff;
+            font-size: 13px; line-height: 1.6;
+        }
+        .ai-result .ai-title { font-weight: 700; color: #4338ca; margin-bottom: 8px; font-size: 14px; }
+        .ai-result .ai-rec {
+            display: inline-block; padding: 3px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-bottom: 8px;
+        }
+        .ai-rec-go { background: #dcfce7; color: #166534; }
+        .ai-rec-caution { background: #fef9c3; color: #854d0e; }
+        .ai-rec-stop { background: #fee2e2; color: #991b1b; }
+        .ai-factors { margin: 6px 0; }
+        .ai-factors span { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px 3px; }
+        .ai-risk-factor { background: #fee2e2; color: #991b1b; }
+        .ai-opportunity { background: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+        <h1>Тендеры Pro</h1>
+        <div class="subtitle">
+            Расширенный поиск спредсказание цены, риском и репутацией заказчика
+        </div>
+
+            <form class="search-form" id="searchForm" novalidate>
+                <div class="form-group">
+                    <label for="query">Поисковый запрос</label>
+                    <input
+                        type="text"
+                        id="query"
+                        name="query"
+                        placeholder="Например: строительство, медоборудование, IT услуги"
+                    >
+                    <div class="field-error" id="queryError"></div>
+                </div>
+                <div class="form-group form-group--short">
+                    <label for="pages">Страниц</label>
+                    <input
+                        type="number"
+                        id="pages"
+                        name="pages"
+                        value="1"
+                        min="1"
+                        max="10"
+                    >
+                </div>
+
+                <div class="form-group" style="flex: 1 1 100%; min-width: 100%;">
+                    <div class="form-section">
+                        <div class="section-title-row">
+                            <div class="section-title">Российские площадки</div>
+                            <button type="button" id="toggleSourcesBtn" class="source-toggle-btn">Выбрать все площадки</button>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="rts" checked> RTS-Tender</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="rutend" checked> RUTEND</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="synapse" checked> Synapse</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="tenderpro" checked> Tender.Pro</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="rostender" checked> РосТендер</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="tektorg" checked> ТЭК-Торг</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="b2b" checked> B2B-Center</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="sberbank_ast" checked> Сбербанк-АСТ</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="zakazrf" checked> ЗаказРФ</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="roseltorg" checked> Росэлторг</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="fabrikant" checked> Фабрикант</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="etpgpb" checked> ЭТП ГПБ</label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <div class="section-title">Зарубежные площадки</div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="made_in_china" checked> Made-in-China</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="globalsources" checked> Global Sources</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="hktdc_sourcing" checked> HKTDC Sourcing</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="b2bchinasources" checked> B2BChinaSources</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="b2bmap" checked> B2BMAP</label>
+                            <label class="checkbox-label"><input type="checkbox" name="sources" value="dhgate"> DHgate</label>
+                        </div>
+                        <div class="field-error" id="sourcesError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="flex: 1 1 100%; min-width: 100%;">
+                    <div class="form-section">
+                        <div class="section-title"></div>
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+                            <div style="flex: 0 1 320px; min-width: 240px;">
+                                <label for="dateFrom" style="display:block; min-height: 34px; font-size: 12px; color: #64748b;">Активны с</label>
+                                <input type="date" id="dateFrom" style="width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #fafafa;">
+                                <div class="field-error" id="dateFromError"></div>
+                            </div>
+                            <div style="flex: 0 1 320px; min-width: 240px;">
+                                <label for="dateTo" style="display:block; min-height: 34px; font-size: 12px; color: #64748b;">Активны до</label>
+                                <input type="date" id="dateTo" style="width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #fafafa;">
+                                <div class="field-error" id="dateToError"></div>
+                            </div>
+                            <div style="flex: 0 1 260px; min-width: 240px;">
+                                <label for="minDaysLeft" style="display:block; min-height: 34px; font-size: 12px; color: #64748b;">Окончание не раньше чем через (дней)</label>
+                                <input type="number" id="minDaysLeft" min="0" max="365" placeholder="" style="width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #fafafa;">
+                                <div class="field-error" id="minDaysLeftError"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 6px; font-size: 11px; color: #94a3b8;">
+                            Фильтр 1: покажет тендеры, активные в выбранном диапазоне. Фильтр 2: покажет тендеры с окончанием не раньше указанного количества дней от сегодня.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="flex: 1 1 100%; min-width: 100%; padding-top: 8px;">
+                    <button type="submit">Начать поиск</button>
+                    <div class="form-error" id="formError"></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="status-panel" id="statusPanel">
+            <h3>📊 Статус парсинга</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="status-text" id="statusText">Инициализация...</div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Всего</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="rtsCount">0</div>
+                <div class="stat-label">RTS-Tender</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="rutendCount">0</div>
+                <div class="stat-label">RUTEND</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="synapseCount">0</div>
+                <div class="stat-label">Synapse</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="tenderproCount">0</div>
+                <div class="stat-label">Tender.Pro</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="rostenderCount">0</div>
+                <div class="stat-label">РосТендер</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="tektorgCount">0</div>
+                <div class="stat-label">ТЭК-Торг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="b2bCount">0</div>
+                <div class="stat-label">B2B-Center</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sberbankCount">0</div>
+                <div class="stat-label">Сбербанк-АСТ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="zakazrfCount">0</div>
+                <div class="stat-label">ЗаказРФ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="roseltorgCount">0</div>
+                <div class="stat-label">Росэлторг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="fabrikantCount">0</div>
+                <div class="stat-label">Фабрикант</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="etpgpbCount">0</div>
+                <div class="stat-label">ЭТП ГПБ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="madeInChinaCount">0</div>
+                <div class="stat-label">Made-in-China</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="globalsourcesCount">0</div>
+                <div class="stat-label">Global Sources</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="hktdcCount">0</div>
+                <div class="stat-label">HKTDC</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="b2bcsCount">0</div>
+                <div class="stat-label">B2BChinaSources</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="b2bmapCount">0</div>
+                <div class="stat-label">B2BMAP</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="dhgateCount">0</div>
+                <div class="stat-label">DHgate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="duration">0</div>
+                <div class="stat-label">Секунд</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters" id="filters" style="display: none;">
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-filter="all">Все</div>
+                <div class="filter-tab" data-filter="rts">RTS-Tender</div>
+                <div class="filter-tab" data-filter="rutend">RUTEND</div>
+                <div class="filter-tab" data-filter="synapse">Synapse</div>
+                <div class="filter-tab" data-filter="tenderpro">Tender.Pro</div>
+                <div class="filter-tab" data-filter="rostender">РосТендер</div>
+                <div class="filter-tab" data-filter="tektorg">ТЭК-Торг</div>
+                <div class="filter-tab" data-filter="b2b">B2B-Center</div>
+                <div class="filter-tab" data-filter="sberbank_ast">Сбербанк-АСТ</div>
+                <div class="filter-tab" data-filter="zakazrf">ЗаказРФ</div>
+                <div class="filter-tab" data-filter="roseltorg">Росэлторг</div>
+                <div class="filter-tab" data-filter="fabrikant">Фабрикант</div>
+                <div class="filter-tab" data-filter="etpgpb">ЭТП ГПБ</div>
+                <div class="filter-tab" data-filter="made_in_china">Made-in-China</div>
+                <div class="filter-tab" data-filter="globalsources">Global Sources</div>
+                <div class="filter-tab" data-filter="hktdc">HKTDC</div>
+                <div class="filter-tab" data-filter="b2bcs">B2BChinaSources</div>
+                <div class="filter-tab" data-filter="b2bmap">B2BMAP</div>
+                <div class="filter-tab" data-filter="dhgate">DHgate</div>
+            </div>
+        </div>
+
+        <div class="selection-toolbar" id="selectionToolbar">
+            <button type="button" class="select-all-btn" id="toggleSelectAllBtn">Выбрать все</button>
+        </div>
+
+        <!-- Logs Panel -->
+        <div class="status-panel" id="logsPanel" style="display: none;">
+            <h3>Логи парсинга</h3>
+            <div id="logsContent" style="max-height: 300px; overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 8px; margin-top: 12px; white-space: pre-wrap; word-break: break-all;"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let currentFilter = 'all';
+        let allTenders = [];
+        let selectedTenderKeys = new Set();
+        let startTime = null;
+
+        function getApiBaseUrl() {
+            const configured = localStorage.getItem('API_BASE_URL');
+            if (configured) return configured.replace(/\/+$/, '');
+            if (window.location.port === '5500') return 'http://127.0.0.1:8001';
+            return window.location.origin;
+        }
+
+        const SOURCE_MAP = {
+            'rts':          { sources: ['RTS-TENDER'],                      badge: 'badge-rts',       card: 'rts-style' },
+            'rutend':       { sources: ['RUTEND', 'RUTEND.RU'],             badge: 'badge-rutend',    card: 'rutend-style' },
+            'synapse':      { sources: ['SYNAPSE'],                         badge: 'badge-synapse',   card: 'synapse-style' },
+            'tenderpro':    { sources: ['TENDER.PRO'],                      badge: 'badge-tenderpro', card: 'tenderpro-style' },
+            'rostender':    { sources: ['ROSTENDER'],                       badge: 'badge-rostender', card: 'rostender-style' },
+            'tektorg':      { sources: ['TEKTORG'],                         badge: 'badge-tektorg',   card: 'tektorg-style' },
+            'b2b':          { sources: ['B2B-CENTER'],                      badge: 'badge-b2b',       card: 'b2b-style' },
+            'sberbank_ast': { sources: ['SBERBANK-AST', 'СБЕРБАНК-АСТ'],   badge: 'badge-sberbank',  card: 'sberbank-style' },
+            'zakazrf':      { sources: ['ZAKAZRF', 'ЗАКАЗРФ'],             badge: 'badge-zakazrf',   card: 'zakazrf-style' },
+            'roseltorg':    { sources: ['ROSELTORG', 'РОСЭЛТОРГ'],         badge: 'badge-roseltorg', card: 'roseltorg-style' },
+            'fabrikant':    { sources: ['FABRIKANT', 'ФАБРИКАНТ'],         badge: 'badge-fabrikant', card: 'fabrikant-style' },
+            'etpgpb':       { sources: ['ETP-GPB', 'ЭТП ГПБ'],            badge: 'badge-etpgpb',    card: 'etpgpb-style' },
+            'made_in_china':{ sources: ['MADE-IN-CHINA.COM'],               badge: 'badge-china',     card: 'china-style' },
+            'globalsources':{ sources: ['GLOBALSOURCES', 'GLOBAL SOURCES'], badge: 'badge-china',     card: 'china-style' },
+            'hktdc':        { sources: ['HKTDC', 'HKTDC SOURCING'],         badge: 'badge-china',     card: 'china-style' },
+            'b2bcs':        { sources: ['B2BCHINASOURCES'],                 badge: 'badge-china',     card: 'china-style' },
+            'b2bmap':       { sources: ['B2BMAP'],                          badge: 'badge-china',     card: 'china-style' },
+            'dhgate':       { sources: ['DHGATE', 'DHGATE.COM'],            badge: 'badge-china',     card: 'china-style' },
+        };
+
+        const CHINA_SOURCES = ['MADE-IN-CHINA.COM', 'DHGATE', 'DHGATE.COM', 'GLOBALSOURCES', 'GLOBAL SOURCES', 'HKTDC', 'HKTDC SOURCING', 'B2BCHINASOURCES', 'B2BMAP'];
+
+        function isChina(source) {
+            return CHINA_SOURCES.includes((source || '').toUpperCase());
+        }
+
+        function getSourceStyle(source) {
+            const s = (source || '').toUpperCase();
+            for (const key in SOURCE_MAP) {
+                if (SOURCE_MAP[key].sources.some(n => s === n || s.includes(n))) {
+                    return { badge: SOURCE_MAP[key].badge, card: SOURCE_MAP[key].card };
+                }
+            }
+            return { badge: 'badge-rutend', card: 'rutend-style' };
+        }
+
+        function countByFilter(filterKey) {
+            const info = SOURCE_MAP[filterKey];
+            if (!info) return 0;
+            return allTenders.filter(t => info.sources.some(s => (t.source || '').toUpperCase() === s || (t.source || '').toUpperCase().includes(s))).length;
+        }
+
+        function formatDateMaskFromDigits(digitsRaw) {
+            const digits = String(digitsRaw || '').replace(/\D/g, '').slice(0, 8);
+            if (digits.length <= 2) return digits;
+            if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+            return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+        }
+
+        function isValidDateParts(day, month, year) {
+            const d = Number(day);
+            const m = Number(month);
+            const y = Number(year);
+            if (!Number.isInteger(d) || !Number.isInteger(m) || !Number.isInteger(y)) return false;
+            if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return false;
+            const dt = new Date(y, m - 1, d);
+            return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+        }
+
+        function formatDigitsDate(rawValue) {
+            let digits = String(rawValue || '').replace(/\D/g, '');
+            if (digits.length === 7) digits = '0' + digits;
+            if (digits.length !== 8) return null;
+            const day = digits.slice(0, 2);
+            const month = digits.slice(2, 4);
+            const year = digits.slice(4, 8);
+            if (!isValidDateParts(day, month, year)) return null;
+            return `${day}.${month}.${year}`;
+        }
+
+        function normalizeDateInput(rawValue) {
+            const v = String(rawValue || '').trim();
+            if (!v) return null;
+
+            const fromDigits = formatDigitsDate(v);
+            if (fromDigits) return fromDigits;
+
+            const dotMatch = v.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+            if (dotMatch && isValidDateParts(dotMatch[1], dotMatch[2], dotMatch[3])) {
+                return `${dotMatch[1]}.${dotMatch[2]}.${dotMatch[3]}`;
+            }
+
+            const isoMatch = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch && isValidDateParts(isoMatch[3], isoMatch[2], isoMatch[1])) {
+                return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+            }
+
+            return null;
+        }
+
+        function bindSmartDateField(fieldId) {
+            const el = document.getElementById(fieldId);
+            if (!el) return;
+            if (el.type === 'date') return;
+            el.addEventListener('input', () => {
+                const masked = formatDateMaskFromDigits(el.value);
+                el.value = masked;
+                clearFieldError(fieldId, `${fieldId}Error`);
+            });
+            el.addEventListener('blur', () => {
+                const value = el.value.trim();
+                if (!value) {
+                    clearFieldError(fieldId, `${fieldId}Error`);
+                    return;
+                }
+                const normalized = normalizeDateInput(value);
+                if (!normalized) {
+                    setFieldError(fieldId, `${fieldId}Error`, 'Введите дату в формате дд.мм.гггг');
+                    return;
+                }
+                el.value = normalized;
+                clearFieldError(fieldId, `${fieldId}Error`);
+            });
+        }
+
+        function setFieldError(inputId, errorId, message) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            if (input) input.classList.add('field-invalid');
+            if (error) error.textContent = message;
+        }
+
+        function clearFieldError(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            if (input) input.classList.remove('field-invalid');
+            if (error) error.textContent = '';
+        }
+
+        function clearSourcesError() {
+            const error = document.getElementById('sourcesError');
+            if (error) error.textContent = '';
+        }
+
+        function validateFormFields(query, sources, dateFromValue, dateToValue, dateFrom, dateTo) {
+            let isValid = true;
+            clearFieldError('query', 'queryError');
+            clearFieldError('dateFrom', 'dateFromError');
+            clearFieldError('dateTo', 'dateToError');
+            clearSourcesError();
+            const formError = document.getElementById('formError');
+            if (formError) formError.textContent = '';
+
+            if (!String(query || '').trim()) {
+                setFieldError('query', 'queryError', 'поле не должно быть пустым');
+                isValid = false;
+            }
+            if (!sources.length) {
+                const error = document.getElementById('sourcesError');
+                if (error) error.textContent = 'поле не должно быть пустым';
+                isValid = false;
+            }
+            if (String(dateFromValue || '').trim() && !dateFrom) {
+                setFieldError('dateFrom', 'dateFromError', 'Введите дату в формате дд.мм.гггг');
+                isValid = false;
+            }
+            if (String(dateToValue || '').trim() && !dateTo) {
+                setFieldError('dateTo', 'dateToError', 'Введите дату в формате дд.мм.гггг');
+                isValid = false;
+            }
+            if (!isValid && formError) {
+                formError.textContent = 'Исправьте ошибки в форме перед запуском поиска';
+            }
+            return isValid;
+        }
+
+        function getSourceCheckboxes() {
+            return Array.from(document.querySelectorAll('input[name="sources"]'));
+        }
+
+        function updateToggleSourcesButtonLabel() {
+            const btn = document.getElementById('toggleSourcesBtn');
+            if (!btn) return;
+            const checkboxes = getSourceCheckboxes().filter(cb => !cb.disabled);
+            const allChecked = checkboxes.length > 0 && checkboxes.every(cb => cb.checked);
+            btn.textContent = allChecked ? 'Снять все площадки' : 'Выбрать все площадки';
+        }
+
+        function toggleAllSources() {
+            const checkboxes = getSourceCheckboxes().filter(cb => !cb.disabled);
+            const allChecked = checkboxes.length > 0 && checkboxes.every(cb => cb.checked);
+            const nextState = !allChecked;
+            checkboxes.forEach(cb => {
+                cb.checked = nextState;
+            });
+            updateToggleSourcesButtonLabel();
+        }
+
+        const toggleSourcesBtn = document.getElementById('toggleSourcesBtn');
+        if (toggleSourcesBtn) {
+            toggleSourcesBtn.addEventListener('click', toggleAllSources);
+            getSourceCheckboxes().forEach(cb => {
+                if (!cb.disabled) {
+                    cb.addEventListener('change', () => {
+                        updateToggleSourcesButtonLabel();
+                        clearSourcesError();
+                    });
+                }
+            });
+            updateToggleSourcesButtonLabel();
+        }
+
+        document.getElementById('query')?.addEventListener('input', () => {
+            clearFieldError('query', 'queryError');
+            const formError = document.getElementById('formError');
+            if (formError) formError.textContent = '';
+        });
+
+        bindSmartDateField('dateFrom');
+        bindSmartDateField('dateTo');
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const query = document.getElementById('query').value;
+            const pages = parseInt(document.getElementById('pages').value) || 1;
+            const sourcesCheckboxes = document.querySelectorAll('input[name="sources"]:checked');
+            const sources = Array.from(sourcesCheckboxes).map(cb => cb.value);
+
+            const dateFromValue = document.getElementById('dateFrom').value || '';
+            const dateToValue = document.getElementById('dateTo').value || '';
+            const dateFrom = normalizeDateInput(dateFromValue);
+            const dateTo = normalizeDateInput(dateToValue);
+            const minDaysLeft = parseInt(document.getElementById('minDaysLeft').value) || null;
+
+            if (!validateFormFields(query, sources, dateFromValue, dateToValue, dateFrom, dateTo)) {
+                return;
+            }
+
+            document.getElementById('statusPanel').classList.add('active');
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('filters').style.display = 'none';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('selectionToolbar').classList.remove('active');
+            document.getElementById('logsPanel').style.display = 'block';
+            document.getElementById('logsContent').textContent = 'Запуск парсинга...\n';
+
+            startTime = Date.now();
+            const serverUrl = getApiBaseUrl();
+
+            try {
+                const response = await fetch(`${serverUrl}/api/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, pages, sources, date_from: dateFrom, date_to: dateTo, min_days_left: minDaysLeft })
+                });
+
+                const data = await response.json();
+                if (data.task_id) {
+                    currentTaskId = data.task_id;
+                    pollTaskStatus();
+                } else {
+                    showError('Не удалось запустить поиск');
+                }
+            } catch (error) {
+                showError('Ошибка подключения к серверу: ' + error.message);
+            }
+        });
+
+        async function pollTaskStatus() {
+            if (!currentTaskId) return;
+
+            const serverUrl = getApiBaseUrl();
+            try {
+                const response = await fetch(`${serverUrl}/api/search/${currentTaskId}`);
+                const data = await response.json();
+
+                document.getElementById('progressBar').style.width = (data.progress ?? 0) + '%';
+                document.getElementById('statusText').textContent = `Статус: ${data.status || 'processing'} (${data.progress ?? 0}%)`;
+
+                if (data.logs && data.logs.length > 0) {
+                    const logsEl = document.getElementById('logsContent');
+                    logsEl.textContent = data.logs.join('\n');
+                    logsEl.scrollTop = logsEl.scrollHeight;
+                }
+
+                if (data.status === 'completed') {
+                    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                    displayResults(data.results || [], data.total_results || 0, duration);
+                } else if (data.status === 'error') {
+                    showError('Ошибка при поиске: ' + (data.error || 'Unknown'));
+                } else {
+                    setTimeout(pollTaskStatus, 2000);
+                }
+            } catch (error) {
+                showError('Ошибка при проверке статуса: ' + error.message);
+            }
+        }
+
+        function displayResults(results, totalResults, duration) {
+            document.getElementById('statusPanel').classList.remove('active');
+            allTenders = (results || []).map((tender, idx) => ({
+                ...tender,
+                __selectionKey: `${tender.source || 'src'}|${tender.tender_id || 'id'}|${tender.url || 'url'}|${idx}`,
+            }));
+            selectedTenderKeys.clear();
+
+            document.getElementById('stats').style.display = 'grid';
+            document.getElementById('totalCount').textContent = allTenders.length;
+            document.getElementById('rtsCount').textContent = countByFilter('rts');
+            document.getElementById('rutendCount').textContent = countByFilter('rutend');
+            document.getElementById('synapseCount').textContent = countByFilter('synapse');
+            document.getElementById('tenderproCount').textContent = countByFilter('tenderpro');
+            document.getElementById('rostenderCount').textContent = countByFilter('rostender');
+            document.getElementById('tektorgCount').textContent = countByFilter('tektorg');
+            document.getElementById('b2bCount').textContent = countByFilter('b2b');
+            document.getElementById('sberbankCount').textContent = countByFilter('sberbank_ast');
+            document.getElementById('zakazrfCount').textContent = countByFilter('zakazrf');
+            document.getElementById('roseltorgCount').textContent = countByFilter('roseltorg');
+            document.getElementById('fabrikantCount').textContent = countByFilter('fabrikant');
+            document.getElementById('etpgpbCount').textContent = countByFilter('etpgpb');
+            document.getElementById('madeInChinaCount').textContent = countByFilter('made_in_china');
+            document.getElementById('globalsourcesCount').textContent = countByFilter('globalsources');
+            document.getElementById('hktdcCount').textContent = countByFilter('hktdc');
+            document.getElementById('b2bcsCount').textContent = countByFilter('b2bcs');
+            document.getElementById('b2bmapCount').textContent = countByFilter('b2bmap');
+            document.getElementById('dhgateCount').textContent = countByFilter('dhgate');
+            document.getElementById('duration').textContent = duration;
+
+            document.getElementById('filters').style.display = 'block';
+            renderTenders(allTenders);
+
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.replaceWith(tab.cloneNode(true));
+            });
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    filterTenders();
+                });
+            });
+        }
+
+        function filterTenders() {
+            if (currentFilter === 'all') {
+                renderTenders(allTenders);
+                return;
+            }
+            const info = SOURCE_MAP[currentFilter];
+            if (!info) { renderTenders(allTenders); return; }
+            const filtered = allTenders.filter(t =>
+                info.sources.some(s => (t.source || '').toUpperCase() === s || (t.source || '').toUpperCase().includes(s))
+            );
+            renderTenders(filtered);
+        }
+
+        function getRiskClass(risk) {
+            const r = parseFloat(risk);
+            if (isNaN(r)) return '';
+            if (r < 0.4) return 'risk-low';
+            if (r <= 0.7) return 'risk-medium';
+            return 'risk-high';
+        }
+
+        function formatPrice(val) {
+            if (val == null || val === undefined || val === '') return null;
+            const n = typeof val === 'number' ? val : parseFloat(val);
+            if (isNaN(n)) return null;
+            return n.toLocaleString('ru-RU', { maximumFractionDigits: 0 }) + ' \u20BD';
+        }
+
+        function renderTenders(tenders) {
+            const resultsDiv = document.getElementById('results');
+            window._tenderIndex = 0;
+            window._aiTenderData = {};
+
+            if (tenders.length === 0) {
+                document.getElementById('selectionToolbar').classList.remove('active');
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">📭</div>
+                        <div class="no-results-text">Тендеры не найдены</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const isChinaFilter = ['made_in_china', 'dhgate'].includes(currentFilter);
+            const chinaOffers = isChinaFilter
+                ? tenders
+                : tenders.filter(t => isChina(t.source));
+            const regularTenders = isChinaFilter
+                ? []
+                : tenders.filter(t => !isChina(t.source));
+
+            updateSelectionToolbar(regularTenders);
+            let html = '';
+
+            if (regularTenders.length > 0) {
+                html += regularTenders.map(tender => {
+                    const style = getSourceStyle(tender.source);
+
+                    const predPrice = tender.predicted_price != null ? formatPrice(tender.predicted_price) : null;
+                    const risk = tender.risk_score != null ? parseFloat(tender.risk_score) : null;
+                    const rep = tender.customer_reputation != null ? parseFloat(tender.customer_reputation) : null;
+
+                    let mlParts = [];
+                    if (predPrice) mlParts.push('Прогноз контракта: ' + predPrice + ' <span style="font-size:10px;color:#94a3b8;">(после торгов)</span>');
+                    if (risk != null && !isNaN(risk)) {
+                        const riskClass = getRiskClass(risk);
+                        mlParts.push('Риск: <span class="risk-badge ' + riskClass + '">' + risk.toFixed(2) + '</span>');
+                    }
+                    if (rep != null && !isNaN(rep)) {
+                        mlParts.push('Репутация: ' + rep.toFixed(2));
+                    }
+
+                    const mlHtml = mlParts.length > 0
+                        ? '<div class="ml-block"><span class="ml-label">ML:</span> ' + mlParts.join(' | ') + '</div>'
+                        : '';
+
+                    const tIdx = window._tenderIndex = (window._tenderIndex || 0);
+                    window._tenderIndex++;
+                    const aiId = 'ai-' + tIdx;
+
+                    if (!window._aiTenderData) window._aiTenderData = {};
+                    window._aiTenderData[aiId] = {
+                        title: tender.title||'', price: tender.price||'',
+                        customer: tender.customer||'', law_type: tender.law_type||'',
+                        purchase_type: tender.purchase_type||'', deadline: tender.deadline||'',
+                        region: tender.region||'', source: tender.source||''
+                    };
+
+                    return `
+                        <div class="tender-card ${style.card}">
+                            <div class="auction__info">
+                                <input class="tender-select" type="checkbox" data-selection-key="${escapeHtml(tender.__selectionKey)}" ${selectedTenderKeys.has(tender.__selectionKey) ? 'checked' : ''}>
+                                ${tender.law_type ? `<span class="auction__badge auction__number">${escapeHtml(tender.law_type)}</span>` : ''}
+                                ${tender.purchase_type ? `<span class="auction__badge auction__type-badge">${escapeHtml(tender.purchase_type)}</span>` : ''}
+                                ${tender.price ? `<span class="auction__badge auction__price-badge">${escapeHtml(tender.price)}</span>` : ''}
+                                <span class="source-badge ${style.badge}">${escapeHtml(tender.source)}</span>
+                            </div>
+                            <div class="tender-header">
+                                <div class="tender-title">
+                                    <a href="${tender.url || '#'}" target="_blank">${escapeHtml(tender.title || '')}</a>
+                                </div>
+                            </div>
+                            <div class="tender-meta">
+                                ${tender.tender_id ? `<div class="meta-item"><span class="meta-label">ID:</span> <span class="meta-value" style="font-weight: 600;">#${escapeHtml(tender.tender_id)}</span></div>` : ''}
+                                ${tender.customer ? `<div class="meta-item"><span class="meta-label">Заказчик:</span> <span class="meta-value">${escapeHtml(tender.customer)}</span></div>` : ''}
+                                ${tender.organizer ? `<div class="meta-item"><span class="meta-label">Организатор:</span> <span class="meta-value">${escapeHtml(tender.organizer)}</span></div>` : ''}
+                                ${tender.platform ? `<div class="meta-item"><span class="meta-label">Площадка:</span> <span class="meta-value">${escapeHtml(tender.platform)}</span></div>` : ''}
+                                ${tender.region ? `<div class="meta-item"><span class="meta-label">Регион:</span> <span class="meta-value">${escapeHtml(tender.region)}</span></div>` : ''}
+                                ${tender.publish_date ? `<div class="meta-item"><span class="meta-label">Опубликовано:</span> <span class="meta-value" style="color: #1976d2;">${escapeHtml(tender.publish_date)}</span></div>` : ''}
+                                ${tender.deadline ? `<div class="meta-item"><span class="meta-label">Срок подачи:</span> <span class="meta-value" style="color: #d32f2f; font-weight: bold;">${escapeHtml(tender.deadline)}</span></div>` : ''}
+                                ${tender.status ? `<div class="meta-item"><span class="meta-label">Статус:</span> <span class="meta-value">${escapeHtml(tender.status)}</span></div>` : ''}
+                            </div>
+                            ${mlHtml}
+                            <button class="ai-btn" data-ai-id="${aiId}" onclick="runAiAnalysis(this)">🤖 AI-анализ рисков</button>
+                            <div id="${aiId}" style="display:none;"></div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (chinaOffers.length > 0) {
+                const offersHtml = chinaOffers.map(offer => {
+                    const imgSrc = offer.image_url || '';
+                    const priceText = offer.price || offer.price_cny || '';
+                    const priceRub = offer.price_rub ? (' / ' + offer.price_rub) : '';
+                    return `
+                        <a href="${offer.url || '#'}" target="_blank" class="china-offer-card" style="text-decoration: none; color: inherit;">
+                            ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" alt="" onerror="this.style.display='none'">` : '<div style="height:40px;background:#f5f5f5;"></div>'}
+                            <div class="offer-body">
+                                <div class="offer-title">${escapeHtml(offer.title || '')}</div>
+                                <div class="offer-price">${escapeHtml(priceText)}${escapeHtml(priceRub)}</div>
+                                ${offer.shop_name ? `<div class="offer-shop">${escapeHtml(offer.shop_name)}</div>` : ''}
+                                <span class="source-badge badge-china" style="margin: 6px 0 0; display: inline-block;">${escapeHtml(offer.source || '')}</span>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+
+                html += `
+                    <div class="china-section">
+                        <h3>Зарубежные площадки (${chinaOffers.length} предложений)</h3>
+                        <div class="china-offers-grid">${offersHtml}</div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+            bindSelectionHandlers();
+        }
+
+        function showError(message) {
+            document.getElementById('statusPanel').classList.remove('active');
+            document.getElementById('results').innerHTML = `
+                <div class="error-panel">
+                    <strong>Ошибка:</strong> ${escapeHtml(message)}
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        async function runAiAnalysis(btn) {
+            const aiId = btn.dataset.aiId;
+            const tender = (window._aiTenderData || {})[aiId];
+            if (!tender) { return; }
+            const resultDiv = document.getElementById(aiId);
+            if (!resultDiv) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Анализирую...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const resp = await fetch(getApiBaseUrl() + '/api/ai/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(tender),
+                });
+                const data = await resp.json();
+
+                const recClass = data.recommendation === 'участвовать' ? 'ai-rec-go'
+                    : data.recommendation === 'не рекомендуется' ? 'ai-rec-stop' : 'ai-rec-caution';
+                const recIcon = data.recommendation === 'участвовать' ? '✅'
+                    : data.recommendation === 'не рекомендуется' ? '🚫' : '⚠️';
+
+                let riskFactorsHtml = '';
+                if (data.risk_factors && data.risk_factors.length) {
+                    riskFactorsHtml = '<div class="ai-factors"><strong>Риски:</strong> ' +
+                        data.risk_factors.map(f => '<span class="ai-risk-factor">' + escapeHtml(f) + '</span>').join('') + '</div>';
+                }
+                let oppsHtml = '';
+                if (data.opportunities && data.opportunities.length) {
+                    oppsHtml = '<div class="ai-factors"><strong>Возможности:</strong> ' +
+                        data.opportunities.map(f => '<span class="ai-opportunity">' + escapeHtml(f) + '</span>').join('') + '</div>';
+                }
+
+                const scoreHtml = data.ai_risk_score != null
+                    ? ' | AI-риск: <span class="risk-badge ' + getRiskClass(data.ai_risk_score) + '">' + parseFloat(data.ai_risk_score).toFixed(2) + '</span>'
+                    : '';
+
+                resultDiv.innerHTML = `
+                    <div class="ai-result">
+                        <div class="ai-title">🤖 AI-анализ</div>
+                        <div><span class="ai-rec ${recClass}">${recIcon} ${escapeHtml(data.recommendation || '')}</span>${scoreHtml}</div>
+                        <div style="margin: 8px 0;">${escapeHtml(data.risk_analysis || '')}</div>
+                        ${riskFactorsHtml}
+                        ${oppsHtml}
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
+                btn.innerHTML = '🤖 Анализ готов ✓';
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="ai-result" style="border-color:#fee2e2;">Ошибка анализа: ' + escapeHtml(err.message) + '</div>';
+                resultDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '🤖 AI-анализ рисков';
+            }
+        }
+
+        function getVisibleTenderCheckboxes() {
+            return Array.from(document.querySelectorAll('.tender-select'));
+        }
+
+        function updateSelectionToolbar(regularTenders) {
+            const toolbar = document.getElementById('selectionToolbar');
+            if (!toolbar) return;
+            toolbar.classList.toggle('active', regularTenders.length > 0);
+            updateSelectAllButtonLabel(getVisibleTenderCheckboxes());
+        }
+
+        function updateSelectAllButtonLabel(checkboxes) {
+            const btn = document.getElementById('toggleSelectAllBtn');
+            if (!btn) return;
+            const allChecked = checkboxes.length > 0 && checkboxes.every(cb => cb.checked);
+            btn.textContent = allChecked ? 'Снять все' : 'Выбрать все';
+        }
+
+        function bindSelectionHandlers() {
+            const btn = document.getElementById('toggleSelectAllBtn');
+            const checkboxes = getVisibleTenderCheckboxes();
+
+            if (btn) {
+                btn.onclick = () => {
+                    const visible = getVisibleTenderCheckboxes();
+                    const allChecked = visible.length > 0 && visible.every(cb => cb.checked);
+                    const nextState = !allChecked;
+                    visible.forEach(cb => {
+                        cb.checked = nextState;
+                        const key = cb.dataset.selectionKey;
+                        if (nextState) selectedTenderKeys.add(key);
+                        else selectedTenderKeys.delete(key);
+                    });
+                    updateSelectAllButtonLabel(visible);
+                };
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const key = cb.dataset.selectionKey;
+                    if (cb.checked) selectedTenderKeys.add(key);
+                    else selectedTenderKeys.delete(key);
+                    updateSelectAllButtonLabel(getVisibleTenderCheckboxes());
+                });
+            });
+
+            updateSelectAllButtonLabel(checkboxes);
+        }
+    </script>
+</body>
+</html>
